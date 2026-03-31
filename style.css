@@ -1,0 +1,288 @@
+:root {
+    --bg-color: #f9fafb;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --panel-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --danger: #ef4444;
+    --success: #10b981;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Ocultar animaciones de fondo que el usuario no quiere */
+.background-shapes {
+    display: none;
+}
+
+/* Contenedores principales */
+.glass-panel { /* Mantengo el nombre de la clase por el HTML, pero no será tipo vidrio */
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+}
+
+.glass-panel.active {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+}
+
+#dashboard-section {
+    max-width: 800px;
+    padding: 40px;
+}
+
+/* Tipografía e Iconos */
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-large {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.icon-medium {
+    font-size: 1.8rem;
+    color: var(--primary);
+}
+
+h1 { font-size: 1.5rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+h2 { font-size: 1.3rem; font-weight: 600; color: var(--text-main); }
+h3 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 15px; font-weight: 500; }
+p { color: var(--text-muted); font-size: 0.95rem; }
+
+/* Formularios e Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.input-group i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px 14px 12px 38px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.error-msg {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+    text-align: center;
+    display: none;
+}
+
+/* Botones */
+.btn-primary {
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+.btn-icon {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: grid;
+    place-items: center;
+}
+
+.btn-icon:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: #fef2f2;
+}
+
+/* Dashboard Specifics */
+.add-password-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.input-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.btn-add {
+    width: 50px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.passwords-list {
+    background: #fff;
+    border-radius: 8px;
+}
+
+.vault-container {
+    display: grid;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Custom Scrollbar más limpia */
+.vault-container::-webkit-scrollbar { width: 6px; }
+.vault-container::-webkit-scrollbar-track { background: transparent; }
+.vault-container::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+.vault-container::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.vault-item {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+.vault-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-site { font-weight: 500; color: var(--text-main); font-size: 1.05rem; }
+.item-email { font-size: 0.85rem; color: var(--text-muted); }
+
+.item-pass-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.item-pass {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background: var(--bg-color);
+    color: var(--text-muted);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px solid var(--border-color);
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s;
+}
+
+.action-btn:hover { background: var(--bg-color); color: var(--text-main); }
+.action-btn.delete:hover { color: var(--danger); background: #fef2f2; }
+.action-btn.copy:hover { color: var(--primary); background: #eff6ff; }
+
+@media (max-width: 600px) {
+    .input-row { flex-direction: column; gap: 8px; }
+    .btn-add { width: 100%; height: auto; }
+    .vault-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .item-actions { align-self: flex-end; }
+    #dashboard-section { padding: 20px; }
+}
