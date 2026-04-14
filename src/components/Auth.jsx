@@ -1,121 +1,165 @@
 import { useState } from 'react';
+import './auth-sliding.css';
 
 export default function Auth({ onLogin, showToast }) {
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPass, setShowPass] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [isRightPanelActive, setIsRightPanelActive] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Sign In State
+  const [signInUser, setSignInUser] = useState('');
+  const [signInPass, setSignInPass] = useState('');
+  const [showSignInPass, setShowSignInPass] = useState(false);
+
+  // Sign Up State
+  const [signUpUser, setSignUpUser] = useState('');
+  const [signUpPass, setSignUpPass] = useState('');
+  const [showSignUpPass, setShowSignUpPass] = useState(false);
+
+  const handleSignIn = (e) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    if (!username || !password) {
-      setErrorMsg('Por favor completa todos los campos.');
+    if (!signInUser || !signInPass) {
+      if (showToast) showToast('Por favor completa todos los campos.');
       return;
     }
 
     const usersStr = localStorage.getItem('app_users');
     const users = usersStr ? JSON.parse(usersStr) : [];
 
-    if (isRegistering) {
-      // Check if user exists
-      const exists = users.find(u => u.username === username);
-      if (exists) {
-        setErrorMsg('El usuario ya existe.');
-        return;
-      }
-      
-      const newUser = { username, password };
-      users.push(newUser);
-      localStorage.setItem('app_users', JSON.stringify(users));
-      setSuccessMsg('Usuario creado con éxito. Ahora inicia sesión.');
-      setIsRegistering(false);
-      setPassword('');
-      
+    if (signInUser === 'admin' && signInPass === '1234') {
+      onLogin({ username: signInUser });
+      return;
+    }
+
+    const exists = users.find(u => u.username === signInUser && u.password === signInPass);
+    if (exists) {
+      onLogin({ username: signInUser });
     } else {
-      // Default admin logic combined with real users
-      if (username === 'admin' && password === '1234') {
-        onLogin({ username });
-        return;
-      }
-      
-      const exists = users.find(u => u.username === username && u.password === password);
-      if (exists) {
-        onLogin({ username });
-      } else {
-        setErrorMsg('Usuario o contraseña incorrectos.');
-        // Efecto shake manual simple en className (lo manejo con clases en body pero omitiremos en jsx directo si no hay lib, o simulamos)
-      }
+      if (showToast) showToast('Usuario o contraseña incorrectos.');
     }
   };
 
+  const handleSignUp = (e) => {
+    e.preventDefault();
+    if (!signUpUser || !signUpPass) {
+      if (showToast) showToast('Por favor completa todos los campos.');
+      return;
+    }
+
+    const usersStr = localStorage.getItem('app_users');
+    const users = usersStr ? JSON.parse(usersStr) : [];
+
+    const exists = users.find(u => u.username === signUpUser);
+    if (exists) {
+      if (showToast) showToast('El usuario ya existe.');
+      return;
+    }
+
+    users.push({ username: signUpUser, password: signUpPass });
+    localStorage.setItem('app_users', JSON.stringify(users));
+    
+    if (showToast) showToast('¡Cuenta creada! Ahora inicia sesión.');
+    setSignUpUser('');
+    setSignUpPass('');
+    setIsRightPanelActive(false);
+  };
+
   return (
-    <main className="glass-panel active" style={{ display: 'block', position: 'relative', margin: '0 auto' }}>
-      <div className="header">
-        <i className={`fa-solid ${isRegistering ? 'fa-user-plus' : 'fa-lock'} icon-large`}></i>
-        <h1>{isRegistering ? 'Registro' : 'Inicia Sesión'}</h1>
-        <p>{isRegistering ? 'Crea tu bóveda segura' : 'Accede a tu bóveda segura'}</p>
+    <div className={`auth-container ${isRightPanelActive ? 'right-panel-active' : ''}`} id="auth-box">
+      
+      {/* Sign Up Form */}
+      <div className="form-container sign-up-container">
+        <form className="auth-form" onSubmit={handleSignUp}>
+          <h1>Crear Cuenta</h1>
+          <p>Usa tu información para registrarte</p>
+          
+          <div className="auth-input-container">
+            <i className="fa-solid fa-user icon-prefix" style={{ position: 'absolute', left: '15px' }}></i>
+            <input 
+              type="text" 
+              placeholder="Nombre de Usuario" 
+              value={signUpUser}
+              onChange={e => setSignUpUser(e.target.value)}
+              required 
+            />
+          </div>
+          
+          <div className="auth-input-container">
+            <i className="fa-solid fa-lock icon-prefix" style={{ position: 'absolute', left: '15px' }}></i>
+            <input 
+              type={showSignUpPass ? "text" : "password"}
+              placeholder="Contraseña" 
+              value={signUpPass}
+              onChange={e => setSignUpPass(e.target.value)}
+              required 
+              style={{ paddingRight: '40px' }}
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowSignUpPass(!showSignUpPass)}
+              style={{ position: 'absolute', right: '15px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            >
+              <i className={`fa-solid ${showSignUpPass ? 'fa-eye-slash' : 'fa-eye'}`} style={{ position: 'static', transform: 'none' }}></i>
+            </button>
+          </div>
+          
+          <button type="submit" className="auth-btn">Registrarse</button>
+        </form>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <i className="fa-solid fa-user"></i>
-          <input 
-            type="text" 
-            placeholder="Usuario" 
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required 
-          />
-        </div>
-        <div className="input-group" style={{ display: 'flex', alignItems: 'center' }}>
-          <i className="fa-solid fa-key" style={{ position: 'absolute', left: '14px' }}></i>
-          <input 
-            type={showPass ? "text" : "password"}
-            placeholder="Contraseña principal" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-            style={{ paddingRight: '40px' }}
-          />
-          <button 
-            type="button" 
-            onClick={() => setShowPass(!showPass)}
-            style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', zIndex: 10 }}
-          >
-            <i className={`fa-solid ${showPass ? 'fa-eye-slash' : 'fa-eye'}`} style={{ position: 'relative', left: 'auto', top: 'auto', transform: 'none' }}></i>
-          </button>
-        </div>
-        
-        {errorMsg && <p className="error-msg" style={{ display: 'block' }}>{errorMsg}</p>}
-        {successMsg && <p style={{ color: 'var(--success)', fontSize: '0.85rem', marginBottom: '15px', textAlign: 'center' }}>{successMsg}</p>}
-        
-        <button type="submit" className="btn-primary">
-          {isRegistering ? 'Registrarse' : 'Entrar'} <i className={`fa-solid ${isRegistering ? 'fa-check' : 'fa-arrow-right'}`}></i>
-        </button>
-      </form>
-
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <p>
-          {isRegistering ? '¿Ya tienes cuenta? ' : '¿No tienes cuenta? '}
-          <button 
-            type="button"
-            onClick={() => {
-              setIsRegistering(!isRegistering);
-              setErrorMsg('');
-              setSuccessMsg('');
-              setShowPass(false);
-            }}
-            style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            {isRegistering ? 'Inicia sesión aquí' : 'Regístrate aquí'}
-          </button>
-        </p>
+      {/* Sign In Form */}
+      <div className="form-container sign-in-container">
+        <form className="auth-form" onSubmit={handleSignIn}>
+          <h1>Iniciar Sesión</h1>
+          <p>Accede con tus credenciales guardadas</p>
+          
+          <div className="auth-input-container">
+            <i className="fa-solid fa-user icon-prefix" style={{ position: 'absolute', left: '15px' }}></i>
+            <input 
+              type="text" 
+              placeholder="Nombre de Usuario" 
+              value={signInUser}
+              onChange={e => setSignInUser(e.target.value)}
+              required 
+            />
+          </div>
+          
+          <div className="auth-input-container">
+            <i className="fa-solid fa-key icon-prefix" style={{ position: 'absolute', left: '15px' }}></i>
+            <input 
+              type={showSignInPass ? "text" : "password"}
+              placeholder="Contraseña" 
+              value={signInPass}
+              onChange={e => setSignInPass(e.target.value)}
+              required 
+              style={{ paddingRight: '40px' }}
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowSignInPass(!showSignInPass)}
+              style={{ position: 'absolute', right: '15px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            >
+              <i className={`fa-solid ${showSignInPass ? 'fa-eye-slash' : 'fa-eye'}`} style={{ position: 'static', transform: 'none' }}></i>
+            </button>
+          </div>
+          
+          <button type="submit" className="auth-btn">Entrar</button>
+        </form>
       </div>
-    </main>
+
+      {/* Overlay Animations */}
+      <div className="overlay-container">
+        <div className="overlay">
+          <div className="overlay-panel overlay-left">
+            <h1 style={{ color: '#fff' }}>¡Bienvenido!</h1>
+            <p style={{ color: '#fff', fontSize: '15px', marginTop: '20px', marginBottom: '30px' }}>Inicia sesión con tu cuenta personal.</p>
+            <button className="auth-btn ghost" onClick={() => setIsRightPanelActive(false)}>Iniciar Sesión</button>
+          </div>
+          <div className="overlay-panel overlay-right">
+            <h1 style={{ color: '#fff' }}>¿Nuevo?</h1>
+            <p style={{ color: '#fff', fontSize: '15px', marginTop: '20px', marginBottom: '30px' }}>Crea tu bóveda registrando tu nueva cuenta aquí.</p>
+            <button className="auth-btn ghost" onClick={() => setIsRightPanelActive(true)}>Registrarse</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
